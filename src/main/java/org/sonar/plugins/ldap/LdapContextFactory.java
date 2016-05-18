@@ -21,12 +21,15 @@ package org.sonar.plugins.ldap;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.MoreObjects;
+import java.io.IOException;
 import java.util.Properties;
 import javax.annotation.Nullable;
 import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.ldap.InitialLdapContext;
+import javax.naming.ldap.StartTlsRequest;
+import javax.naming.ldap.StartTlsResponse;
 import org.apache.commons.lang.StringUtils;
 import org.sonar.api.config.Settings;
 import org.sonar.api.utils.log.Logger;
@@ -61,6 +64,7 @@ public class LdapContextFactory {
   private static final String SASL_REALM_PROPERTY = "java.naming.security.sasl.realm";
 
   private final String providerUrl;
+  private final boolean startTLS;
   private final String authentication;
   private final String factory;
   private final String username;
@@ -72,6 +76,7 @@ public class LdapContextFactory {
     this.factory = StringUtils.defaultString(settings.getString(settingsPrefix + ".contextFactoryClass"), DEFAULT_FACTORY);
     this.realm = settings.getString(settingsPrefix + ".realm");
     this.providerUrl = ldapUrl;
+    this.startTLS = settings.getBoolean(settingsPrefix + ".StartTLS");
     this.username = settings.getString(settingsPrefix + ".bindDn");
     this.password = settings.getString(settingsPrefix + ".bindPassword");
   }
@@ -92,7 +97,18 @@ public class LdapContextFactory {
   }
 
   private InitialDirContext createInitialDirContext(String principal, String credentials, boolean pooling) throws NamingException {
-    return new InitialLdapContext(getEnvironment(principal, credentials, pooling), null);
+    InitialLdapContext ctx = new InitialLdapContext(getEnvironment(principal, credentials, pooling), null);
+    if (startTLS) {
+      StartTlsResponse tls = (StartTlsResponse) ctx.extendedOperation(new StartTlsRequest());
+      try {
+        tls.negotiate();
+      } catch (IOException e) {
+        NamingException ex = new NamingException("StartTLS failed");
+        ex.initCause(e);
+        throw ex;
+      }
+    }
+    return ctx;
   }
 
   private Properties getEnvironment(@Nullable String principal, @Nullable String credentials, boolean pooling) {
