@@ -1,5 +1,5 @@
 /*
- * SonarQube LDAP Plugin :: Integration Tests
+ * SonarQube LDAP Plugin
  * Copyright (C) 2009-2016 SonarSource SA
  * mailto:contact AT sonarsource DOT com
  *
@@ -17,16 +17,25 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package org.sonarsource.ldap.it;
+package org.sonar.plugins.ldap.server;
 
-import com.sonar.orchestrator.locator.FileLocation;
-import com.sonar.orchestrator.locator.Location;
-import java.io.File;
+/**
+ * Settings for Sonar:
+ * <pre>
+ * sonar.security.realm: LDAP
+ * ldap.url: ldap://localhost:1024
+ * ldap.baseDn: dc=example,dc=org
+ * ldap.group.baseDn: dc=example,dc=org
+ * </pre>
+ */
+public class Main {
 
-public abstract class AbstractTest {
-
-  public static Location ldapPluginLocation() {
-    return FileLocation.byWildcardMavenFilename(new File("../sonar-ldap-plugin/target/"), "sonar-ldap-plugin-*.jar");
+  public static void main(String[] args) throws Exception {
+    ApacheDS server = ApacheDS.start("example.org", "dc=example,dc=org");
+    String resourceFile = "\"/static-groups.example.org.ldif\"";
+    // String resourceFile = "\"/users.infosupport.com.ldif\"";
+    server.importLdif(Main.class.getResourceAsStream(resourceFile));
+    System.out.println(server.getUrl());
   }
 
 }

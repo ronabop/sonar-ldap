@@ -4,7 +4,7 @@ set -euo pipefail
 
 function configureTravis {
   mkdir ~/.local
-  curl -sSL https://github.com/SonarSource/travis-utils/tarball/v27 | tar zx --strip-components 1 -C ~/.local
+  curl -sSL https://github.com/SonarSource/travis-utils/tarball/v28 | tar zx --strip-components 1 -C ~/.local
   source ~/.local/bin/install
 }
 configureTravis
@@ -12,9 +12,9 @@ configureTravis
 # for Selenium tests
 start_xvfb
 
-# CI
-mvn verify -B -e -V
+export DEPLOY_PULL_REQUEST=true
 
-# integration tests
-cd it
-mvn -DldapVersion="DEV" -Dsonar.runtimeVersion="DEV" -Dmaven.test.redirectTestOutputToFile=false verify -B -e -V
+regular_mvn_build_deploy_analyze
+
+./run-integration-tests.sh "DEV"
+# all other versions of SQ are tested by the QA pipeline at SonarSource

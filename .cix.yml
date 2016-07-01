@@ -1,0 +1,6 @@
+TEST:
+  - run-integration-tests
+ 
+SQ_VERSION:
+  - LATEST_RELEASE
+  - DEV

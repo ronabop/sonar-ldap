@@ -1,7 +1,7 @@
 /*
  * SonarQube LDAP Plugin :: Integration Tests
- * Copyright (C) 2009 SonarSource
- * sonarqube@googlegroups.com
+ * Copyright (C) 2009-2016 SonarSource SA
+ * mailto:contact AT sonarsource DOT com
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -13,9 +13,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 package org.sonarsource.ldap.it;
 
@@ -45,7 +45,7 @@ public class LdapTest extends AbstractTest {
   private static ApacheDS ldapServer;
   private static Orchestrator orchestrator;
 
-  private static void start(boolean savePasswords, boolean syncGroups) {
+  private static void start(boolean syncGroups) {
     // Start LDAP server
     try {
       ldapServer = ApacheDS.start(BASE_DN, "target/ldap-work");
@@ -59,7 +59,6 @@ public class LdapTest extends AbstractTest {
       .setContext("/")
       .addPlugin(ldapPluginLocation())
       .setMainPluginKey("ldap")
-      .setServerProperty("sonar.security.savePassword", Boolean.toString(savePasswords))
       // enable ldap
       .setServerProperty("sonar.security.realm", "LDAP")
       .setServerProperty("ldap.url", ldapServer.getUrl())
@@ -99,7 +98,7 @@ public class LdapTest extends AbstractTest {
    */
   @Test
   public void test() throws Exception {
-    start(true, true);
+    start(true);
 
     // When user exists in Sonar, but not in LDAP (technical account)
     // Then can login because admin is technical account by default
@@ -137,19 +136,6 @@ public class LdapTest extends AbstractTest {
     assertThat(loginAttempt("godin", "54321")).as("New password works in Sonar").isEqualTo(AUTHORIZED);
     assertThat(loginAttempt("godin", "12345")).as("Old password does not work in Sonar").isEqualTo(NOT_AUTHORIZED);
     executeSelenese("password-changed");
-
-    // When user was modified in LDAP, but LDAP not available
-    importLdif("change-details");
-    ldapServer.disableAnonymousAccess();
-    // Then old details available in Sonar and latest password works (because sonar.security.savePassword=true), but not previous
-    assertThat(loginAttempt("godin", "54321")).as("New password works in Sonar").isEqualTo(AUTHORIZED);
-    assertThat(loginAttempt("godin", "12345")).as("Old password does not work in Sonar").isEqualTo(NOT_AUTHORIZED);
-    executeSelenese("password-changed");
-
-    // When LDAP available again
-    ldapServer.enableAnonymousAccess();
-    // Then new details (email, groups) available in Sonar
-    executeSelenese("details-changed");
   }
 
   /**
@@ -157,7 +143,7 @@ public class LdapTest extends AbstractTest {
    */
   @Test
   public void blank_passwords_are_forbidden() throws Exception {
-    start(true, true);
+    start(true);
 
     importLdif("add-user-without-password");
 
@@ -169,7 +155,7 @@ public class LdapTest extends AbstractTest {
    */
   @Test
   public void test2() throws Exception {
-    start(false, true);
+    start(true);
 
     // When user exists in Sonar, but not in LDAP
     // Then can login
@@ -192,17 +178,6 @@ public class LdapTest extends AbstractTest {
     assertThat(loginAttempt("godin", "54321")).as("New password works in Sonar").isEqualTo(AUTHORIZED);
     assertThat(loginAttempt("godin", "12345")).as("Old password does not work in Sonar").isEqualTo(NOT_AUTHORIZED);
     executeSelenese("password-changed");
-
-    // When user was modified in LDAP, but LDAP not available
-    importLdif("change-details");
-    ldapServer.disableAnonymousAccess();
-    // Then user can't login (because sonar.security.savePassword=false)
-    assertThat(loginAttempt("godin", "54321")).as("New password does not work in Sonar").isEqualTo(NOT_AUTHORIZED);
-
-    // When LDAP available again
-    ldapServer.enableAnonymousAccess();
-    // Then new details (email, groups) available in Sonar
-    executeSelenese("details-changed");
   }
 
   /**
@@ -210,7 +185,7 @@ public class LdapTest extends AbstractTest {
    */
   @Test
   public void deactivate_group_synchronization() {
-    start(false, false);
+    start(false);
 
     // When user created in LDAP
     importLdif("add-user");

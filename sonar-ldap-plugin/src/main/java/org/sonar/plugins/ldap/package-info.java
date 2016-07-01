@@ -1,5 +1,5 @@
 /*
- * SonarQube LDAP Plugin :: Integration Tests
+ * SonarQube LDAP Plugin
  * Copyright (C) 2009-2016 SonarSource SA
  * mailto:contact AT sonarsource DOT com
  *
@@ -17,16 +17,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package org.sonarsource.ldap.it;
+@ParametersAreNonnullByDefault
+package org.sonar.plugins.ldap;
 
-import com.sonar.orchestrator.locator.FileLocation;
-import com.sonar.orchestrator.locator.Location;
-import java.io.File;
+import javax.annotation.ParametersAreNonnullByDefault;
 
-public abstract class AbstractTest {
-
-  public static Location ldapPluginLocation() {
-    return FileLocation.byWildcardMavenFilename(new File("../sonar-ldap-plugin/target/"), "sonar-ldap-plugin-*.jar");
-  }
-
-}
