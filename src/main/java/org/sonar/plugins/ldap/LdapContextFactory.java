@@ -97,8 +97,10 @@ public class LdapContextFactory {
   }
 
   private InitialDirContext createInitialDirContext(String principal, String credentials, boolean pooling) throws NamingException {
-    InitialLdapContext ctx = new InitialLdapContext(getEnvironment(principal, credentials, pooling), null);
+    final InitialLdapContext ctx;
     if (startTLS) {
+      ctx = new InitialLdapContext(getEnvironment(null, null, /* TODO(Godin): connection pooling requires proper TLS shutdown */false), null);
+      // http://docs.oracle.com/javase/jndi/tutorial/ldap/ext/starttls.html
       StartTlsResponse tls = (StartTlsResponse) ctx.extendedOperation(new StartTlsRequest());
       try {
         tls.negotiate();
@@ -107,6 +109,11 @@ public class LdapContextFactory {
         ex.initCause(e);
         throw ex;
       }
+      ctx.addToEnvironment(Context.SECURITY_AUTHENTICATION, authentication);
+      ctx.addToEnvironment(Context.SECURITY_PRINCIPAL, principal);
+      ctx.addToEnvironment(Context.SECURITY_CREDENTIALS, credentials);
+    } else {
+      ctx = new InitialLdapContext(getEnvironment(principal, credentials, pooling), null);
     }
     return ctx;
   }
