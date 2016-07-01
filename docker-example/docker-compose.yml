@@ -1,0 +1,48 @@
+version: "2"
+
+services:
+  # http://localhost:9000
+  # login: admin
+  # password: admin
+  sonarqube:
+    build:
+      context: ..
+      dockerfile: docker-example/Dockerfile.sonarqube
+    networks:
+      - sonarqube
+    ports:
+      - "9000:9000"
+    entrypoint: /root/import-certificate.sh
+    command: /opt/sonarqube/bin/run.sh
+
+  ldap-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.ldap
+    networks:
+      - sonarqube
+    environment:
+      - HOSTNAME=ldap-server
+      - LDAP_TLS_VERIFY_CLIENT=never
+      # https://www.digitalocean.com/community/tutorials/how-to-encrypt-openldap-connections-using-starttls
+      - LDAP_TLS_ENFORCE=true
+#      - LDAP_TLS_CIPHER_SUITE=NORMAL
+#    command: --loglevel debug
+
+#  # http://localhost:9001
+#  # login: cn=admin,dc=example,dc=org
+#  # password: admin
+#  ldap-admin:
+#    image: osixia/phpldapadmin
+#    networks:
+#      - sonarqube
+#    ports:
+#      - "9001:80"
+#    environment:
+#      - PHPLDAPADMIN_LDAP_HOSTS=ldap-server
+#      # seems that next setting might cause an issue - see https://github.com/osixia/docker-phpLDAPadmin/issues/23
+#      - PHPLDAPADMIN_HTTPS=false
+
+networks:
+  sonarqube:
+    driver: bridge

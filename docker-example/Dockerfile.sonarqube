@@ -1,0 +1,9 @@
+FROM sonarqube:5.6-alpine
+
+RUN apk --update add openssl
+
+COPY docker-example/sonar.properties /opt/sonarqube/conf/sonar.properties
+COPY target/sonar-ldap-plugin-*-SNAPSHOT.jar /opt/sonarqube/extensions/plugins/
+
+COPY docker-example/import-certificate.sh /root/import-certificate.sh
+RUN chmod a+x /root/import-certificate.sh
