@@ -112,6 +112,8 @@ public class LdapContextFactory {
       ctx.addToEnvironment(Context.SECURITY_AUTHENTICATION, authentication);
       ctx.addToEnvironment(Context.SECURITY_PRINCIPAL, principal);
       ctx.addToEnvironment(Context.SECURITY_CREDENTIALS, credentials);
+      // Explicitly initiate "bind" operation:
+      ctx.reconnect(null);
     } else {
       ctx = new InitialLdapContext(getEnvironment(principal, credentials, pooling), null);
     }
