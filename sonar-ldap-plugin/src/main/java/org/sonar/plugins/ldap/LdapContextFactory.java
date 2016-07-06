@@ -99,7 +99,13 @@ public class LdapContextFactory {
   private InitialDirContext createInitialDirContext(String principal, String credentials, boolean pooling) throws NamingException {
     final InitialLdapContext ctx;
     if (startTLS) {
-      ctx = new InitialLdapContext(getEnvironment(null, null, /* TODO(Godin): connection pooling requires proper TLS shutdown */false), null);
+      // Note that env should not contain properties SECURITY_AUTHENTICATION, SECURITY_PRINCIPAL and SECURITY_CREDENTIALS to avoid bind prior to StartTLS,
+      // because it will fail if server strictly requires TLS.
+      Properties env = new Properties();
+      env.put(Context.INITIAL_CONTEXT_FACTORY, factory);
+      env.put(Context.PROVIDER_URL, providerUrl);
+      env.put(Context.REFERRAL, DEFAULT_REFERRAL);
+      ctx = new InitialLdapContext(env, null);
       // http://docs.oracle.com/javase/jndi/tutorial/ldap/ext/starttls.html
       StartTlsResponse tls = (StartTlsResponse) ctx.extendedOperation(new StartTlsRequest());
       try {
