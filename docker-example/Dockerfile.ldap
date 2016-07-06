@@ -1,3 +1,7 @@
 FROM osixia/openldap
 
 COPY tester.ldif /container/service/slapd/assets/config/bootstrap/ldif/tester.ldif
+
+COPY certs/server.crt /container/service/slapd/assets/certs/my-cert.crt
+COPY certs/server.key /container/service/slapd/assets/certs/my-cert.key
+COPY certs/ca.crt /container/service/slapd/assets/certs/my-ca.crt

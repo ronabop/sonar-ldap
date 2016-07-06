@@ -12,8 +12,8 @@ services:
       - sonarqube
     ports:
       - "9000:9000"
-    entrypoint: /root/import-certificate.sh
-    command: /opt/sonarqube/bin/run.sh
+    environment:
+      - SONARQUBE_WEB_JVM_OPTS=-Djavax.net.ssl.keyStore=/root/keystore -Djavax.net.ssl.keyStorePassword=changeit
 
   ldap-server:
     build:
@@ -23,11 +23,14 @@ services:
       - sonarqube
     environment:
       - HOSTNAME=ldap-server
-      - LDAP_TLS_VERIFY_CLIENT=never
+#      - LDAP_TLS_VERIFY_CLIENT=never
+      - LDAP_TLS_CRT_FILENAME=my-cert.crt
+      - LDAP_TLS_KEY_FILENAME=my-cert.key
+      - LDAP_TLS_CA_CRT_FILENAME=my-ca.crt
 #      # https://www.digitalocean.com/community/tutorials/how-to-encrypt-openldap-connections-using-starttls
 #      # "To force StartTLS ONLY, make sure that ldaps:// is removed" http://www.linuxlasse.net/linux/howtos/OpenLDAP_Server,_authenticate_linux_users
 #      - LDAP_TLS_ENFORCE=true
-#      - LDAP_TLS_CIPHER_SUITE=NORMAL
+      - LDAP_TLS_CIPHER_SUITE=NORMAL
 #    command: --loglevel debug
 
 #  # http://localhost:9001
