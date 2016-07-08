@@ -2,6 +2,9 @@
 
 set -e
 
+mkdir certs
+cd certs
+
 openssl genrsa -out ca.key 4096
 openssl req -x509 -new -nodes -key ca.key -days 9131 -out ca.crt -subj "/C=CH/ST=Geneva/L=Geneva/O=SonarSource SA/CN=sonarqube.com"
 
