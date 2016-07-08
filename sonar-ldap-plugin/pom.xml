@@ -76,6 +76,27 @@
     <!-- ApacheDS -->
     <dependency>
       <groupId>org.apache.directory.server</groupId>
+      <artifactId>apacheds-all</artifactId>
+      <version>${version.org.apache.directory.server}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.directory.shared</groupId>
+          <artifactId>shared-ldap-schema</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.directory.api</groupId>
+          <artifactId>api-ldap-schema-data</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.directory.jdbm</groupId>
+          <artifactId>apacheds-jdbm1</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <!--
+    <dependency>
+      <groupId>org.apache.directory.server</groupId>
       <artifactId>apacheds-core</artifactId>
       <version>${version.org.apache.directory.server}</version>
       <scope>test</scope>
@@ -91,6 +112,7 @@
       <version>${version.org.apache.directory.server}</version>
       <scope>test</scope>
     </dependency>
+    -->
   </dependencies>
 
 </project>

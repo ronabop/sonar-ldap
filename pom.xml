@@ -61,7 +61,7 @@
   </ciManagement>
 
   <properties>
-    <version.org.apache.directory.server>1.5.5</version.org.apache.directory.server>
+    <version.org.apache.directory.server>2.0.0-M22</version.org.apache.directory.server>
 
     <gitRepositoryName>sonar-ldap</gitRepositoryName>
   </properties>
