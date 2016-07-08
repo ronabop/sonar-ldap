@@ -28,7 +28,6 @@ services:
       - LDAP_TLS_KEY_FILENAME=my-cert.key
       - LDAP_TLS_CA_CRT_FILENAME=my-ca.crt
 #      # https://www.digitalocean.com/community/tutorials/how-to-encrypt-openldap-connections-using-starttls
-#      # "To force StartTLS ONLY, make sure that ldaps:// is removed" http://www.linuxlasse.net/linux/howtos/OpenLDAP_Server,_authenticate_linux_users
       - LDAP_TLS_ENFORCE=true
       - LDAP_TLS_CIPHER_SUITE=NORMAL
 #    command: --loglevel debug
